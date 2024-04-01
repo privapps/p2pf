@@ -3,3 +3,11 @@
 A simple tool for P2P file transfer in browser using TypeScript, React.js and Peer.js
 
 See at: [https://chidokun.github.io/p2p-file-transfer](https://chidokun.github.io/p2p-file-transfer)
+
+Add piping for exchange peerjs ID.
+
+```
+yarn
+npm run build
+npm start
+```

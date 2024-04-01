@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState }  from 'react';
 import {Button, Card, Col, Input, Menu, MenuProps, message, Row, Space, Typography, Upload, UploadFile} from "antd";
 import {CopyOutlined, UploadOutlined} from "@ant-design/icons";
 import {useAppDispatch, useAppSelector} from "./store/hooks";
@@ -6,6 +6,7 @@ import {startPeer, stopPeerSession} from "./store/peer/peerActions";
 import * as connectionAction from "./store/connection/connectionActions"
 import {DataType, PeerConnection} from "./helpers/peer";
 import {useAsyncState} from "./helpers/hooks";
+
 
 const {Title} = Typography
 type MenuItem = Required<MenuProps>['items'][number]
@@ -31,6 +32,10 @@ export const App: React.FC = () => {
     const peer = useAppSelector((state) => state.peer)
     const connection = useAppSelector((state) => state.connection)
     const dispatch = useAppDispatch()
+    
+    const [pipingValue, setPipingValue] = useState('https://piping.glitch.me/');
+    const [keyValue, setKeyValue] = useState('');
+    const [remoteIdValue, setRemoteIdValue] = useState('');
 
     const handleStartSession = () => {
         dispatch(startPeer())
@@ -77,6 +82,52 @@ export const App: React.FC = () => {
         }
     }
 
+    const handleShareSend = async () => {
+        const url = `${pipingValue}${keyValue}`;
+        console.log(url)
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: peer.id , // You can adjust the data being sent as needed
+                    headers: {
+                        'Content-Type': 'text/plain'
+                    }
+                });
+                if (response.ok) {
+                    message.info('Key shared successfully.');
+                } else {
+                    message.error('Failed to share key.');
+                }
+            } catch (error) {
+                alert('Error posting key:'+ error);
+            }
+    }
+    const handleShareGet = async () => {
+        const url = `${pipingValue}${keyValue}`;
+        try {
+            console.log(url)
+            const response = await fetch(url);
+            if (response.ok) {
+                const data = await response.text();
+                await navigator.clipboard.writeText(data || "")
+                message.info(`Copied: remote ${data}`)
+                setRemoteIdValue(data)
+                dispatch(connectionAction.changeConnectionInput(data));
+            } else {
+                message.error('Failed to fetch value.');
+            }
+        } catch (error) {
+            message.error('Error fetching value:' + error);
+        }
+    }
+
+    const handleRemoteIdInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setRemoteIdValue(e.target.value)
+        console.log("set " + e.target.value)
+        dispatch(connectionAction.changeConnectionInput(e.target.value));
+    }
+   
+
     return (
         <Row justify={"center"} align={"top"}>
             <Col xs={24} sm={24} md={20} lg={16} xl={12}>
@@ -98,8 +149,33 @@ export const App: React.FC = () => {
                         <div hidden={!peer.started}>
                             <Card>
                                 <Space direction="horizontal">
-                                    <Input placeholder={"ID"}
-                                           onChange={e => dispatch(connectionAction.changeConnectionInput(e.target.value))}
+                                    <Input
+                                        placeholder="Key"
+                                        id="key"
+                                        value={keyValue}
+                                        onChange={(e) => setKeyValue(e.target.value)}
+                                        required={true}
+                                    />
+                                    <Button onClick={handleShareSend}>Send ID</Button>
+                                    <Button onClick={handleShareGet}>Get ID</Button>
+                                    <select
+                                        name="piping"
+                                        id="piping"
+                                        value={pipingValue}
+                                        onChange={(e) => setPipingValue(e.target.value)}
+                                    >
+                                        <option value="https://piping.glitch.me/">https://piping.glitch.me/</option>
+                                        <option value="https://piping-47q675ro2guv.runkit.sh/">https://piping-47q675ro2guv.runkit.sh/</option>
+                                        <option value="https://ppng.io/">https://ppng.io/</option>
+                                    </select>
+                                </Space>
+                            </Card>
+
+                            <Card>
+                                <Space direction="horizontal">
+                                    <Input placeholder={"Remote ID"}
+                                            value={remoteIdValue}
+                                            onChange={handleRemoteIdInputChange}
                                            required={true}
                                            />
                                     <Button onClick={handleConnectOtherPeer}

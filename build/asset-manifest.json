@@ -1,0 +1,12 @@
+{
+  "files": {
+    "main.js": "/p2pf/static/js/main.6563033a.js",
+    "static/js/453.6b406749.chunk.js": "/p2pf/static/js/453.6b406749.chunk.js",
+    "index.html": "/p2pf/index.html",
+    "main.6563033a.js.map": "/p2pf/static/js/main.6563033a.js.map",
+    "453.6b406749.chunk.js.map": "/p2pf/static/js/453.6b406749.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.6563033a.js"
+  ]
+}
