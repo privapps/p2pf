@@ -158,7 +158,9 @@ export const App: React.FC = () => {
                                     />
                                     <Button onClick={handleShareSend}>Send ID</Button>
                                     <Button onClick={handleShareGet}>Get ID</Button>
-                                    <select
+                                </Space>
+                                <Space direction="horizontal">
+                                <select
                                         name="piping"
                                         id="piping"
                                         value={pipingValue}
